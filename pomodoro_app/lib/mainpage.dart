@@ -58,10 +58,7 @@ class _MainPageState extends State<MainPage> {
           ),
         ],
       ),
-      body: IndexedStack(
-        index: currentPageIndex,
-        children: telas,
-      ),
+      body: IndexedStack(index: currentPageIndex, children: telas),
     );
   }
 }

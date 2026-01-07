@@ -1,17 +1,5 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-
-void main() => runApp(const MyApp());
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: HomePage());
-  }
-}
+import 'cronometro.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,38 +9,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int minutos = 25;
-  int segundos = 0;
-  Timer? timer;
-  String exibindo = '25:00';
+  final Cronometro cronometro = Cronometro();
 
-  @override
-  void initState() {
-    super.initState();
-
-    timer = Timer.periodic(Duration(seconds: 1), (_) {
-      setState(() {
-        if (minutos == 0 && segundos == 0) {
-          timer?.cancel();
-          return;
-        }
-
-        if (segundos == 0) {
-          minutos--;
-          segundos = 59;
-        } else {
-          segundos--;
-        }
-
-        exibindo =
-            '${minutos.toString().padLeft(2, '0')}:${segundos.toString().padLeft(2, '0')}';
-      });
-    });
+  void atualizarTela() {
+    setState(() {});
   }
 
   @override
   void dispose() {
-    timer?.cancel();
+    cronometro.dispose();
     super.dispose();
   }
 
@@ -64,25 +29,75 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               "Tarefa atual: \nFazendo um app pomodoro",
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white, fontSize: 30),
             ),
+
             Container(
               height: 150,
               width: 300,
-              margin: EdgeInsets.only(top: 150, bottom: 150),
+              margin: const EdgeInsets.only(top: 150, bottom: 150),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15.0),
                 color: Colors.red[900],
               ),
               child: Center(
                 child: Text(
-                  exibindo,
-                  style: TextStyle(fontSize: 48, color: Colors.white),
+                  cronometro.exibindo,
+                  style: const TextStyle(fontSize: 48, color: Colors.white),
                 ),
               ),
+            ),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: cronometro.estado == EstadoPomodoro.parado
+                  ? [
+                      ElevatedButton(
+                        child: const Icon(Icons.play_arrow),
+                        onPressed: () {
+                          cronometro.play(atualizarTela);
+                          setState(() {});
+                        },
+                      ),
+                    ]
+                  : cronometro.estado == EstadoPomodoro.rodando
+                  ? [
+                      ElevatedButton(
+                        child: const Icon(Icons.pause),
+                        onPressed: () {
+                          cronometro.pause();
+                          setState(() {});
+                        },
+                      ),
+                      const SizedBox(width: 45),
+                      ElevatedButton(
+                        child: const Icon(Icons.stop),
+                        onPressed: () {
+                          cronometro.stop();
+                          setState(() {});
+                        },
+                      ),
+                    ]
+                  : [
+                      ElevatedButton(
+                        child: const Icon(Icons.play_arrow),
+                        onPressed: () {
+                          cronometro.play(atualizarTela);
+                          setState(() {});
+                        },
+                      ),
+                      const SizedBox(width: 45),
+                      ElevatedButton(
+                        child: const Icon(Icons.stop),
+                        onPressed: () {
+                          cronometro.stop();
+                          setState(() {});
+                        },
+                      ),
+                    ],
             ),
           ],
         ),
